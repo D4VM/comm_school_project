@@ -1,6 +1,6 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from project_scraper import scrape_product
+from scrape import scrape_product
 
 # Change password
 uri = "mongodb://mongo.d4vm.duckdns.org"
