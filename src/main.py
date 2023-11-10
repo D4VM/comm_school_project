@@ -1,6 +1,4 @@
-import re
 from fastapi import FastAPI, status
-from fastapi.responses import RedirectResponse
 from tools.db import add_to_db
 
 app = FastAPI(
@@ -17,7 +15,7 @@ async def root():
 async def post_to_db(full_path: str):
     url = {'path': full_path}
     add_to_db(url['path'])
-    return RedirectResponse(url='/api/product/1', status_code=status.HTTP_303_SEE_OTHER)
+    return
 
 
 @app.get('/api/product/1')
