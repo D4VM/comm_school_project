@@ -1,15 +1,21 @@
+import configparser
+from pathlib import Path
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from scrape import scrape_product
 
-# Change password
-uri = "mongodb://mongo.d4vm.duckdns.org"
-client = MongoClient(uri, server_api=ServerApi('1'))
+# reading database url from config.ini
+config_path = Path.cwd().parent.parent / "var/config.ini"
+config = configparser.ConfigParser()
+config.read(config_path)
+url = config.get("database", "url")
+
+client = MongoClient(url, server_api=ServerApi('1'))
 db = client.myauto_database  # database name
 cars = db.cars_collection  # collection name
 
 
-def test_db_connection(uri: str) -> bool:
+def test_db_connection() -> bool:
     """
     Testing if connection to free tier database is successful.
     :return:
@@ -35,7 +41,7 @@ def add_to_db(url: str):
     :param url:
     :return:
     """
-    if test_db_connection(uri):
+    if test_db_connection(url):
         cars.insert_one(scrape_product(url))
         print("Added Item to DB")
         return True
@@ -53,15 +59,18 @@ def get_product():
 def update_product():
     pass
 
+
 # for [POST]/api/appraisal_request შეფასების მოთხოვნის შექმნა
 # მოთხოვნის გამგზავნი დამატებით აგზავნის შემდეგ ინფორმაციას:
 # პროდუქტის ბმული - რომლის გაანალიზებაც არის საჭირო
 def appraisal_request():
     pass
 
+
 # for [GET]/api/appraisal_request/<appraisal_request_id> შეფასების მოთხოვნის დეტალური ინფორმაცია
 # ???
 def appraisal_request_return():
     pass
+
 
 debug = True
