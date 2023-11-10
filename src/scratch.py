@@ -1,3 +1,21 @@
-URL: str = 'https://www.myauto.ge/ka/pr/940336302141/iyideba-spec-teqnika-satvirto-daf-xf-105-2018-dizeli-tbilisi?offerType=vipPlus'
+dict = \
+    {
+        'car_id': 98260786,
+        'man_id': 25,
+        'model_id': 659,
+        'prod_year': 2001,
+        'price_usd': 3300,
+        'price_value': 8910,
+        'fuel_type_id': 2,
+        'gear_type_id': 3
+    }
 
-debug = True
+'''
+https://api2.myauto.ge/ka/products
+?TypeID=0
+&ForRent=0
+&Mans=25.569
+&CurrencyID=3
+&MileageType=1
+&Page=1
+'''

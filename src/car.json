@@ -1,0 +1,14 @@
+{
+  "data": {
+    "info": {
+      "car_id": 98316902,
+      "prod_year": 2015,
+      "man_id": 42,
+      "price_usd": 12800,
+      "price_value": 34560,
+      "fuel_type_id": 2,
+      "gear_type_id": 3,
+      "model_id": 1592
+    }
+  }
+}
