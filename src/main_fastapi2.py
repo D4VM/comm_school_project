@@ -1,7 +1,7 @@
 import re
 from fastapi import FastAPI, status
 from fastapi.responses import RedirectResponse
-from utils.db import add_to_db
+from tools.db import add_to_db
 
 app = FastAPI(
     title="MyAuto Project API"
