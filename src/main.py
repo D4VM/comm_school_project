@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from tools.db import add_to_db
+from tools.db import add_to_db, query_product
+from tools.utils import extract_id
 
 app = FastAPI(
     title="MyAuto Project API"
@@ -18,8 +19,10 @@ async def post_to_db(full_path: str):
     return {"message": "Success"}
 
 
-
-# @app.get('/api/product/1')
-# async def get_product():
-#     return {'message': 'product1'}
-#
+@app.get('/api/product/{full_path:path}')
+async def query_db(full_path: str):
+    url = {'path': full_path}
+    # extracted id must be INT!
+    ext_id = int(extract_id(url['path']))
+    query = query_product(ext_id)
+    return query

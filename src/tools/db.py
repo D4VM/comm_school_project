@@ -3,6 +3,7 @@ from pathlib import Path
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from tools.scrape import scrape_product
+from tools.utils import extract_id
 
 config_path = Path.cwd().parent / "var/config.ini"
 config = configparser.ConfigParser()
@@ -52,8 +53,26 @@ def add_to_db(provided_url: str):
 
 
 # for [GET]/api/product/<product_id> პროდუქტის დეტალური ინფორმაცია
-def get_product():
-    pass
+def query_product(product_id: int):
+    """
+    query database for specific car_id
+    :param product_id:
+    :return:
+    """
+    try:
+        print(client.admin.command('ping'))
+        query_db = {"car_id": int(product_id)}
+        print(f"Query: {query_db}")
+        # {'_id': 0} added because ValueError: [TypeError("'ObjectId' object is not iterable") (stackoverflow)
+
+        products = cars.find(query_db, {'_id': 0})
+        if products:
+            for product in products:
+                return product
+        return {"message": f"{query_db['car_id']} ID not found in database"}
+
+    except Exception as e:
+        return f"An error occurred: {e}"
 
 
 # for [PUT]/api/product/<product_id> პროდუქტის ცვლილება
