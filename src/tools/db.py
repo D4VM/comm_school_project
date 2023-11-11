@@ -3,7 +3,6 @@ from pathlib import Path
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from tools.scrape import scrape_product
-from tools.utils import extract_id
 
 config_path = Path.cwd().parent / "var/config.ini"  # change to Path.cwd().parent.parent to test db.py.
 config = configparser.ConfigParser()
@@ -21,7 +20,7 @@ def test_db_connection() -> bool:
     :return:
     """
     # Create a new client and connect to the server
-    # client = MongoClient(ur;, server_api=ServerApi('1'))
+    # client = MongoClient(url, server_api=ServerApi('1'))
     # Send a ping to confirm a successful connection
     # reading database url from config.ini
 
@@ -59,19 +58,22 @@ def query_product(product_id: int):
     :param product_id:
     :return:
     """
-    try:
-        print(client.admin.command('ping'))
-        query_db = {"car_id": int(product_id)}
-        print(f"Query: {query_db}")
-        # {'_id': 0} added because ValueError: [TypeError("'ObjectId' object is not iterable") (stackoverflow)
-        products = cars.find(query_db, {'_id': 0})
-        if products:
-            for product in products:
-                return product
-        return {"message": f"{query_db['car_id']} ID not found in database"}
+    if test_db_connection():
+        try:
+            print(client.admin.command('ping'))
+            query_db = {"car_id": int(product_id)}
+            print(f"Query: {query_db}")
+            # {'_id': 0} added because ValueError: [TypeError("'ObjectId' object is not iterable") (stackoverflow)
+            products = cars.find(query_db, {'_id': 0})
+            if products:
+                for product in products:
+                    return product
+            return {"message": f"{query_db['car_id']} ID not found in database"}
 
-    except Exception as e:
-        return f"An error occurred: {e}"
+        except Exception as e:
+            return f"An error occurred: {e}"
+    else:
+        print('Problem with getting item from database')
 
 
 # for [PUT]/api/product/<product_id> პროდუქტის ცვლილება
@@ -90,6 +92,3 @@ def appraisal_request():
 # ???
 def appraisal_request_return():
     pass
-
-
-debug = True

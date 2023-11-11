@@ -39,4 +39,4 @@ def scrape_product(provided_url: str) -> dict:
             return car_dict
 
 
-debug = True
+

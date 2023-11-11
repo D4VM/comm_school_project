@@ -12,6 +12,7 @@ async def root():
     return {"message": "Hello World"}
 
 
+# post api to add myauto.ge URL to database
 @app.post('/api/product/{full_path:path}')
 async def post_to_db(full_path: str):
     url = {'path': full_path}
@@ -19,6 +20,7 @@ async def post_to_db(full_path: str):
     return {"message": "Success"}
 
 
+# query's database for specific car ID.
 @app.get('/api/product/{full_path:path}')
 async def query_db(full_path: str):
     url = {'path': full_path}
@@ -26,3 +28,6 @@ async def query_db(full_path: str):
     ext_id = int(extract_id(url['path']))
     query = query_product(ext_id)
     return query
+
+
+
