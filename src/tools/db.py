@@ -2,13 +2,12 @@ import configparser
 from pathlib import Path
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from scrape import scrape_product
+from tools.scrape import scrape_product
 
-# reading database url from config.ini
-config_path = Path.cwd().parent.parent / "var/config.ini"
+config_path = Path.cwd().parent / "var/config.ini"
 config = configparser.ConfigParser()
 config.read(config_path)
-url = config.get("database", "url")
+url = config.get("DB", "DB_url")
 
 client = MongoClient(url, server_api=ServerApi('1'))
 db = client.myauto_database  # database name
@@ -21,8 +20,10 @@ def test_db_connection() -> bool:
     :return:
     """
     # Create a new client and connect to the server
-    # client = MongoClient(uri, server_api=ServerApi('1'))
+    # client = MongoClient(ur;, server_api=ServerApi('1'))
     # Send a ping to confirm a successful connection
+    # reading database url from config.ini
+
     try:
         client.admin.command('ping')
         # print("Pinged Successfully. Connected to MongoDB!")
@@ -35,14 +36,14 @@ def test_db_connection() -> bool:
 
 
 # for [POST]/api/product ახალი პროდუქტის დამატება / შექმნა
-def add_to_db(url: str):
+def add_to_db(provided_url: str):
     """
     Adding new ONE item to Database if connection is True
-    :param url:
+    :param provided_url:
     :return:
     """
-    if test_db_connection(url):
-        cars.insert_one(scrape_product(url))
+    if test_db_connection():
+        cars.insert_one(scrape_product(provided_url))
         print("Added Item to DB")
         return True
     else:
