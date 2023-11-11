@@ -5,7 +5,7 @@ from pymongo.server_api import ServerApi
 from tools.scrape import scrape_product
 from tools.utils import extract_id
 
-config_path = Path.cwd().parent / "var/config.ini"
+config_path = Path.cwd().parent / "var/config.ini"  # change to Path.cwd().parent.parent to test db.py.
 config = configparser.ConfigParser()
 config.read(config_path)
 url = config.get("DB", "DB_url")
@@ -64,7 +64,6 @@ def query_product(product_id: int):
         query_db = {"car_id": int(product_id)}
         print(f"Query: {query_db}")
         # {'_id': 0} added because ValueError: [TypeError("'ObjectId' object is not iterable") (stackoverflow)
-
         products = cars.find(query_db, {'_id': 0})
         if products:
             for product in products:
