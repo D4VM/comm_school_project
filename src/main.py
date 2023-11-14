@@ -13,21 +13,20 @@ async def root():
 
 
 # post api to add myauto.ge URL to database
-@app.post('/api/product/{full_path:path}')
-async def post_to_db(full_path: str):
-    url = {'path': full_path}
-    add_to_db(url['path'])
+@app.post('/api/product/')
+async def post_to_db(url: str):
+    add_to_db(url)
     return {"message": "Success"}
 
 
 # query's database for specific car ID.
-@app.get('/api/product/{full_path:path}')
-async def query_db(full_path: str):
-    url = {'path': full_path}
+@app.get('/api/product/')
+async def query_db(url: str):
     # extracted id must be INT!
-    ext_id = int(extract_id(url['path']))
+    ext_id = int(extract_id(url))
     query = query_product(ext_id)
     return query
+
 
 
 
