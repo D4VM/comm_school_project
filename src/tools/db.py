@@ -2,8 +2,7 @@ import configparser
 from pathlib import Path
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from tools.scrape import scrape_product
-
+from .scrape import scrape_product
 config_path = Path.cwd().parent / "var/config.ini"  # change to Path.cwd().parent.parent to test db.py.
 config = configparser.ConfigParser()
 config.read(config_path)
