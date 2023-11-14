@@ -1,14 +1,8 @@
-import configparser
-from pathlib import Path
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from .scrape import scrape_product
-config_path = Path.cwd().parent / "var/config.ini"  # change to Path.cwd().parent.parent to test db.py.
-config = configparser.ConfigParser()
-config.read(config_path)
-url = config.get("DB", "DB_url")
+from .var.config import db_url
 
-client = MongoClient(url, server_api=ServerApi('1'))
+client = MongoClient(db_url, server_api=ServerApi('1'))
 db = client.myauto_database  # database name
 cars = db.cars_collection  # collection name
 
@@ -35,15 +29,15 @@ def test_db_connection() -> bool:
 
 
 # for [POST]/api/product ახალი პროდუქტის დამატება / შექმნა
-def add_to_db(provided_url: str):
+def insert_to_db(data):
     """
     Adding new ONE item to Database if connection is True
     :param provided_url:
     :return:
     """
     if test_db_connection():
-        cars.insert_one(scrape_product(provided_url))
-        print("Added Item to DB")
+        cars.insert_one(data)
+        print("---> Added Item to DB")
         return True
     else:
         print('Problems with adding items to database')
@@ -59,9 +53,7 @@ def query_product(product_id: int):
     """
     if test_db_connection():
         try:
-            print(client.admin.command('ping'))
             query_db = {"car_id": int(product_id)}
-            print(f"Query: {query_db}")
             # {'_id': 0} added because ValueError: [TypeError("'ObjectId' object is not iterable") (stackoverflow)
             products = cars.find(query_db, {'_id': 0})
             if products:
@@ -72,7 +64,7 @@ def query_product(product_id: int):
         except Exception as e:
             return f"An error occurred: {e}"
     else:
-        print('Problem with getting item from database')
+        print('---> Problem with getting item from database')
 
 
 # for [PUT]/api/product/<product_id> პროდუქტის ცვლილება
@@ -91,5 +83,3 @@ def appraisal_request():
 # ???
 def appraisal_request_return():
     pass
-
-
