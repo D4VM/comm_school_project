@@ -1,7 +1,7 @@
 import requests
 from time import sleep
 from random import randrange as rr
-from .utils import validate_url, extract_id
+from tools.utils import validate_url, extract_id
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N)\

@@ -1,8 +1,6 @@
 from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-from .var.config import db_url
 
-client = MongoClient(db_url, server_api=ServerApi('1'))
+client = MongoClient()
 db = client.myauto_database  # database name
 cars = db.cars_collection  # collection name
 
