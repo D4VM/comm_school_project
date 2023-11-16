@@ -8,15 +8,13 @@ from time import sleep
 import rq_dashboard
 
 app = Flask(__name__)
+app.config["RQ_DASHBOARD_REDIS_URL"] = 'redis://localhost:6379'
 app.config.from_object(rq_dashboard.default_settings)
 rq_dashboard.web.setup_rq_connection(app)
 app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 
-# Explicitly provide Redis configuration
 redis_conn = Redis()
 q = Queue(connection=redis_conn)
-
-
 
 
 @app.route('/')
@@ -30,11 +28,12 @@ def insert_to_database(url: str):
     while not job_scrape.is_finished:
         sleep(1)
     car_data = job_scrape.return_value()
-
     job_database_insert = q.enqueue(insert_to_db, car_data)
+
     while not job_database_insert.is_finished:
         sleep(1)
     returned_status = job_database_insert.return_value()
+
     return {'status': returned_status}
 
 
