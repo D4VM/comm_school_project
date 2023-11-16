@@ -4,7 +4,6 @@ from tools.db import query_product
 from tools.utils import extract_id
 from redis import Redis
 from rq import Queue
-from time import sleep
 import rq_dashboard
 
 app = Flask(__name__)
