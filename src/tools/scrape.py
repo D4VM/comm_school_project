@@ -2,6 +2,7 @@ import requests
 from time import sleep
 from random import randrange as rr
 from tools.utils import validate_url, extract_id
+from tools.db import insert_to_db
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N)\
@@ -9,10 +10,10 @@ AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36"
 }
 
 
-def scrape_product(provided_url: str) -> dict:
+def scrape_add_to_db(provided_url: str) -> dict:
     """
-    Returns JSON data requested from myauto.ge as dict.
-
+    Scrapes product from myauto.ge
+    Inserts to database
     :param provided_url:
     :return:
     """
@@ -35,8 +36,4 @@ def scrape_product(provided_url: str) -> dict:
                 'fuel_type_id': json_data['fuel_type_id'],
                 'gear_type_id': json_data['gear_type_id']
             }
-
-            return car_dict
-
-
-debug = True
+            return insert_to_db(car_dict)

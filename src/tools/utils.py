@@ -31,4 +31,3 @@ def extract_id(provided_url: str) -> str:
     return product_id.group(0)
 
 
-debug = True

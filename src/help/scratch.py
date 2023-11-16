@@ -1,30 +1,14 @@
-import configparser
-from pathlib import Path
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
+import requests
 
-config_path = Path.cwd().parent.parent / "var/config.ini"
-config = configparser.ConfigParser()
-config.read(config_path)
-url = config.get("DB", "DB_url")
+url_list = [
+    'https://www.myauto.ge/ka/pr/97040958/iyideba-manqanebi-sedani-bmw-540-2017-benzini-batumi?offerType=superVip',
+    'https://www.myauto.ge/ka/pr/97623410/iyideba-manqanebi-jipi-lexus-rx-450-2022-hibridi-tbilisi?offerType=superVip',
+    'https://www.myauto.ge/ka/pr/97904774/iyideba-manqanebi-jipi-mercedes-benz-glb-35-amg-2023-benzini-tbilisi?offerType=superVip',
+    'https://www.myauto.ge/ka/pr/98623538/iyideba-jipi-hyundai-santa-fe-2019-benzini-rustavis-avtobazroba?offerType=basic',
+    'https://www.myauto.ge/ka/pr/98623530/iyideba-sedani-ford-escape-2019-benzini-gzashi-sak.-sken?offerType=basic'
+]
 
-client = MongoClient(url, server_api=ServerApi('1'))
-db = client['myauto_database']  # database name
-cars = db['cars_collection']  # collection name
-
-try:
-    print(client.admin.command('ping'))
-    query_db = {"car_id": 98420894}
-
-    print(f"Query: {query_db}")
-    products = cars.find(query_db, {'_id': 0})
-    # products = cars.find({})
-
-    # Iterate over the cursor to print the documents
-    for product in products:
-        print(product)
-
-
-except Exception as e:
-    print(f"An error occurred: {e}")
-
+for links in url_list:
+    print('start')
+    requests.post(f'http://127.0.0.1:5000/api/product/{links}')
+    print('done')
