@@ -1,6 +1,6 @@
 from flask import Flask
-from tools.scrape import scrape_product
-from tools.db import insert_to_db, query_product
+from tools.scrape import scrape_add_to_db
+from tools.db import query_product
 from tools.utils import extract_id
 from redis import Redis
 from rq import Queue
@@ -24,24 +24,26 @@ def hello_world():
 
 @app.post('/api/product/<path:url>/')
 def insert_to_database(url: str):
-    job_scrape = q.enqueue(scrape_product, url)
-    while not job_scrape.is_finished:
-        sleep(1)
-    car_data = job_scrape.return_value()
-    job_database_insert = q.enqueue(insert_to_db, car_data)
-
-    while not job_database_insert.is_finished:
-        sleep(1)
-    returned_status = job_database_insert.return_value()
-
-    return {'status': returned_status}
+    """
+    Adding task for scrape data and insert to database
+    :param url:
+    :return:
+    """
+    q.enqueue(scrape_add_to_db, url)
+    return {'status': 'task being added'}
 
 
 @app.get('/api/product/<path:url>')
 def query_database(url: str):
+    """
+    Query database for specific car_id.
+    extract_id func extracts car id from provided url.
+    :param url:
+    :return:
+    """
     product_id = int(extract_id(url))  # converting to int, extracting id from myauto URL
     found_product = query_product(product_id)
-    return {'status': 'ok', 'data': found_product}
+    return {'data': found_product}
 
 
 if __name__ == '__main__':
