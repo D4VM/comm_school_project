@@ -64,6 +64,13 @@ def scrape_and_add(url: str):
 # Page=1
 
 def search_scrape(url: str):
+    """
+    Returns a list with dicts with data for search car.
+    Must provide url.
+    :param url:
+    :return:
+    """
+
     def get_search_url(page_num=1) -> str:  # In case we need to cycle through pages...
         """
         Creating a Valid Searchable URL for specific car
@@ -102,4 +109,13 @@ def search_scrape(url: str):
         return 'Bad Status Code'
 
 
-debug = True
+def add_one_from_list(url):
+    car_list = search_scrape(url)
+    for car in car_list:
+        add_one(car)
+
+
+# Figure Out whats wrong with get_search_url
+# Why its returning all sorts of years intead of one!
+#debug = True
+
