@@ -39,6 +39,7 @@ def scrape_one(provided_url: str) -> dict:
             return car_dict
 
 
+# Workaround with RQ
 def scrape_and_add(url: str):
     """
     Scraping one product & adding one to database.
@@ -50,3 +51,55 @@ def scrape_and_add(url: str):
         add_one(car_dict)
         return True
     return False
+
+
+# https://api2.myauto.ge/ka/products?
+# TypeID=0&
+# ForRent=0&
+# Mans=41.1077&
+# ProdYearFrom=2020&
+# ProdYearTo=2023&
+# CurrencyID=3&
+# MileageType=1&
+# Page=1
+
+def search_scrape(url: str):
+    def get_search_url(page_num=1) -> str:  # In case we need to cycle through pages...
+        """
+        Creating a Valid Searchable URL for specific car
+        :return:
+        """
+        car_data = scrape_one(url)
+        car_man = car_data['man_id']
+        car_mod = car_data['model_id']
+        c_Mans = f'{car_man}.{car_mod}'  # Done
+        c_ProdYearFrom = car_data['prod_year']
+        c_ProdYearTo = car_data['prod_year']
+        start_url = 'https://api2.myauto.ge/ka/products?TypeID=0&ForRent=0&'
+        end_url = 'CurrencyID=3&MileageType=1&Page='  # page_num instead of 1
+
+        search_url = f'{start_url}Mans={c_Mans}&ProdYearFrom={c_ProdYearFrom}&ProdYearTo{c_ProdYearTo}&{end_url}{page_num}'
+        return search_url
+
+    cars_list = []
+    searched_cars = requests.get(get_search_url(), headers=headers)
+    if searched_cars.status_code == 200:
+        json_data = searched_cars.json().get('data').get('items')
+        for item in json_data:
+            car_dict = {
+                'car_id': item['car_id'],
+                'man_id': item['man_id'],
+                'model_id': item['model_id'],
+                'prod_year': item['prod_year'],
+                'price_usd': item['price_usd'],
+                'price_value': item['price_value'],
+                'fuel_type_id': item['fuel_type_id'],
+                'gear_type_id': item['gear_type_id']
+            }
+            cars_list.append(car_dict)
+        return cars_list
+    else:
+        return 'Bad Status Code'
+
+
+debug = True

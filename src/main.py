@@ -1,16 +1,17 @@
-from flask import Flask
+from flask import Flask, request
 from tools.scrape import scrape_and_add
 from tools.db import query_product
 from tools.utils import extract_id
 from redis import Redis
 from rq import Queue
-import rq_dashboard
+
+# import rq_dashboard
 
 app = Flask(__name__)
-app.config["RQ_DASHBOARD_REDIS_URL"] = 'redis://10.10.1.153:6379'
-app.config.from_object(rq_dashboard.default_settings)
-rq_dashboard.web.setup_rq_connection(app)
-app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
+# app.config["RQ_DASHBOARD_REDIS_URL"] = 'redis://10.10.1.153:6379'
+# app.config.from_object(rq_dashboard.default_settings)
+# rq_dashboard.web.setup_rq_connection(app)
+# app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 
 redis_conn = Redis(host='10.10.1.153')
 q = Queue(connection=redis_conn)
@@ -34,7 +35,7 @@ def insert_to_database(url: str):
     return {'status': 'task being added'}
 
 
-@app.get('/api/product/<path:url>')
+@app.get('/api/product/<path:url>/')
 def query_database(url: str):
     """
     Query database for specific car_id.
@@ -45,6 +46,14 @@ def query_database(url: str):
     product_id = int(extract_id(url))  # converting to int, extracting id from myauto URL
     found_product = query_product(product_id)
     return {'data': found_product}
+
+
+# [POST]/api/appraisal_request
+@app.post('/api/appraisal_request/')
+def send_appraisal_request():
+    p = extract_id(request.args.get('p', type=str))
+
+    return {'message': p}
 
 
 if __name__ == '__main__':
