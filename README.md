@@ -2,8 +2,8 @@
 
 
 ### [POST] /api/product/<URL>
-#### Scraping one product & adding it to database.
-#### Also adds this function as task to Redis RQ
+Scraping one product & adding it to database.
+Also adds this function as task to Redis RQ  
 Request example:
 ```
 /api/product/https://www.myauto.ge/ka/pr/97264590/iyideba-manqanebi-sedani-audi-s7-2017-benzini-tbilisi?offerType=superVip
@@ -26,7 +26,7 @@ Database data example:
 ```
 
 ### [GET] /api/product/<URL>
-#### Queries database for specific car_id/
+Queries database for specific car_id   
 Request example:
 ```
 /api/product/https://www.myauto.ge/ka/pr/98620870/iyideba-manqanebi-hechbeqi-toyota-prius-2010-hibridi-tbilisi?offerType=superVip
@@ -48,8 +48,10 @@ API response:
 ```
 
 ### [POST] /api/appraisal_request/
-#### Searches for cars on myauto, adds cars to dict then appends to list. Returns a list with dicts with data for searched car, then adds one by one data to database from a returned list.
-#### Also adds this function as task to Redis RQ
+Searches for cars on myauto, adds cars to dict then appends to list.  
+Returns a list with dicts with data for searched car, then adds one by one data to database from a returned list. 
+
+Also adds this function as task to Redis RQ  
 Request example:
 ```
 /api/appraisal_request/?p=https://www.myauto.ge/ka/pr/98620870/iyideba-manqanebi-hechbeqi-toyota-prius-2010-hibridi-tbilisi?offerType=superVip
@@ -57,7 +59,7 @@ Request example:
 Note: `?p=` is used here as a post parameter
 
 ### [GET] /api/appraisal_request/
-#### Queries mongodb for cars.Returns Average Price(price_usd)  
+Queries mongodb for cars.Returns Average Price(price_usd)  
 Request example:
 ```
 /api/appraisal_request/?p=https://www.myauto.ge/ka/pr/98620870/iyideba-manqanebi-hechbeqi-toyota-prius-2010-hibridi-tbilisi?offerType=superVip
