@@ -31,3 +31,15 @@ def extract_id(provided_url: str) -> str:
     return product_id.group(0)
 
 
+def calculate_average(numbers):
+    """
+    As func name says
+    :param numbers:
+    :return:
+    """
+    if not numbers:
+        return 0  # Avoid division by zero for an empty list
+
+    total = sum(numbers)
+    average = total / len(numbers)
+    return average

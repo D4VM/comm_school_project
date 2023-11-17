@@ -27,6 +27,7 @@
 #### Search page for specific model
 
 ```https://api2.myauto.ge/ka/products?TypeID=0&ForRent=0&Mans=25.569&CurrencyID=3&MileageType=1&Page=1```
+```https://api2.myauto.ge/ka/products?TypeID=0&ForRent=0&Mans=41.1077&ProdYearFrom=2020&ProdYearTo=2023&CurrencyID=3&MileageType=1&Page=1```
 
 ```python
 TypeID = 0  # 0 - მანქანები, 1 - წპეცტექნიკა, 2 - მოტო
