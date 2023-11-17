@@ -1,6 +1,7 @@
 from pymongo.mongo_client import MongoClient
 
-client = MongoClient(host='10.10.1.153', port=27017)
+# client = MongoClient(host='10.10.1.153', port=27017)  # Windows Host
+client = MongoClient()
 db = client.myauto_database  # database name
 cars = db.cars_collection  # collection name
 
@@ -65,19 +66,15 @@ def query_product(product_id: int):
         print('---> Problem with getting item from database')
 
 
-# for [PUT]/api/product/<product_id> პროდუქტის ცვლილება
-def update_product():
-    pass
+def query_database(car_dict: dict):
+    query_fields = {
+        'man_id': car_dict['man_id'],
+        'model_id': car_dict['model_id'],
+        'prod_year': car_dict['prod_year']
+    }
+    result = cars.find(query_fields)
+    car_price = []
+    for item in result:
+        car_price.append(item['price_usd'])
 
-
-# for [POST]/api/appraisal_request შეფასების მოთხოვნის შექმნა
-# მოთხოვნის გამგზავნი დამატებით აგზავნის შემდეგ ინფორმაციას:
-# პროდუქტის ბმული - რომლის გაანალიზებაც არის საჭირო
-def appraisal_request():
-    pass
-
-
-# for [GET]/api/appraisal_request/<appraisal_request_id> შეფასების მოთხოვნის დეტალური ინფორმაცია
-# ???
-def appraisal_request_return():
-    pass
+    return car_price

@@ -2,7 +2,6 @@ import requests
 from time import sleep
 from random import randrange as rr
 from tools.utils import validate_url, extract_id
-from tools.db import add_one
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N)\
@@ -39,20 +38,6 @@ def scrape_one(provided_url: str) -> dict:
             return car_dict
 
 
-# Workaround with RQ
-def scrape_and_add(url: str):
-    """
-    Scraping one product & adding one to database.
-    :param url:
-    :return:
-    """
-    car_dict = scrape_one(url)
-    if car_dict is not None:
-        add_one(car_dict)
-        return True
-    return False
-
-
 # https://api2.myauto.ge/ka/products?
 # TypeID=0&
 # ForRent=0&
@@ -85,7 +70,7 @@ def search_scrape(url: str):
         start_url = 'https://api2.myauto.ge/ka/products?TypeID=0&ForRent=0&'
         end_url = 'CurrencyID=3&MileageType=1&Page='  # page_num instead of 1
 
-        search_url = f'{start_url}Mans={c_Mans}&ProdYearFrom={c_ProdYearFrom}&ProdYearTo{c_ProdYearTo}&{end_url}{page_num}'
+        search_url = f'{start_url}Mans={c_Mans}&ProdYearFrom={c_ProdYearFrom}&ProdYearTo={c_ProdYearTo}&{end_url}{page_num}'
         return search_url
 
     cars_list = []
@@ -107,15 +92,3 @@ def search_scrape(url: str):
         return cars_list
     else:
         return 'Bad Status Code'
-
-
-def add_one_from_list(url):
-    car_list = search_scrape(url)
-    for car in car_list:
-        add_one(car)
-
-
-# Figure Out whats wrong with get_search_url
-# Why its returning all sorts of years intead of one!
-#debug = True
-

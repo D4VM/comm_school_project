@@ -1,6 +1,6 @@
 from flask import Flask, request
-from tools.scrape import scrape_and_add
-from tools.db import query_product
+from tools.op import scrape_and_add, add_one_from_list, appraisal
+from tools.db import query_product, query_database
 from tools.utils import extract_id
 from redis import Redis
 from rq import Queue
@@ -8,12 +8,14 @@ from rq import Queue
 # import rq_dashboard
 
 app = Flask(__name__)
-# app.config["RQ_DASHBOARD_REDIS_URL"] = 'redis://10.10.1.153:6379'
+
+# app.config["RQ_DASHBOARD_REDIS_URL"] = 'redis://0.0.0.0:6379'
 # app.config.from_object(rq_dashboard.default_settings)
 # rq_dashboard.web.setup_rq_connection(app)
 # app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 
-redis_conn = Redis(host='10.10.1.153')
+# redis_conn = Redis(host='10.10.1.153')  # Windows Host
+redis_conn = Redis()
 q = Queue(connection=redis_conn)
 
 
@@ -32,7 +34,7 @@ def insert_to_database(url: str):
 
     q.enqueue(scrape_and_add, url)
 
-    return {'status': 'task being added'}
+    return {'task': 'task being added'}
 
 
 @app.get('/api/product/<path:url>/')
@@ -51,9 +53,17 @@ def query_database(url: str):
 # [POST]/api/appraisal_request
 @app.post('/api/appraisal_request/')
 def send_appraisal_request():
-    p = extract_id(request.args.get('p', type=str))
+    p = request.args.get('p', type=str)
+    q.enqueue(add_one_from_list, p)
+    return {'task': 'task for appraisal added'}
 
-    return {'message': p}
+
+@app.get('/api/appraisal_request/')
+def get_appraisal():
+    # TODO: იდეაში კარგი იქნება თუ ესეც ჩაჯდეს ტასკში
+    p = request.args.get('p', type=str)
+    price_average = round(appraisal(p))
+    return {'average_price': f'{price_average}'}
 
 
 if __name__ == '__main__':
