@@ -1,5 +1,5 @@
 from flask import Flask
-from tools.scrape import scrape_add_to_db
+from tools.scrape import scrape_and_add
 from tools.db import query_product
 from tools.utils import extract_id
 from redis import Redis
@@ -7,12 +7,12 @@ from rq import Queue
 import rq_dashboard
 
 app = Flask(__name__)
-app.config["RQ_DASHBOARD_REDIS_URL"] = 'redis://localhost:6379'
+app.config["RQ_DASHBOARD_REDIS_URL"] = 'redis://10.10.1.153:6379'
 app.config.from_object(rq_dashboard.default_settings)
 rq_dashboard.web.setup_rq_connection(app)
 app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
 
-redis_conn = Redis()
+redis_conn = Redis(host='10.10.1.153')
 q = Queue(connection=redis_conn)
 
 
@@ -28,7 +28,9 @@ def insert_to_database(url: str):
     :param url:
     :return:
     """
-    q.enqueue(scrape_add_to_db, url)
+
+    q.enqueue(scrape_and_add, url)
+
     return {'status': 'task being added'}
 
 

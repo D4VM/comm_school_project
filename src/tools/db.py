@@ -1,6 +1,6 @@
 from pymongo.mongo_client import MongoClient
 
-client = MongoClient()
+client = MongoClient(host='10.10.1.153', port=27017)
 db = client.myauto_database  # database name
 cars = db.cars_collection  # collection name
 
@@ -27,10 +27,10 @@ def test_db_connection() -> bool:
 
 
 # for [POST]/api/product ახალი პროდუქტის დამატება / შექმნა
-def insert_to_db(data):
+def add_one(data):
     """
     Adding new ONE item to Database if connection is True
-    :param provided_url:
+    :param data:
     :return:
     """
     if test_db_connection():
