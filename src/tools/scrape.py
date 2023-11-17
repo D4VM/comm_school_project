@@ -50,7 +50,7 @@ def scrape_one(provided_url: str) -> dict:
 
 def search_scrape(url: str):
     """
-    Returns a list with dicts with data for search car.
+    Returns a list with dicts with data for searched car.
     Must provide url.
     :param url:
     :return:

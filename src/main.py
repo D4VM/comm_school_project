@@ -53,6 +53,11 @@ def query_database(url: str):
 # [POST]/api/appraisal_request
 @app.post('/api/appraisal_request/')
 def send_appraisal_request():
+    """
+    Send request to query myauto for specific car ( man_id, model_id, prod_year).
+    Founded cars then are added to mongodb.
+    :return:
+    """
     p = request.args.get('p', type=str)
     q.enqueue(add_one_from_list, p)
     return {'task': 'task for appraisal added'}
