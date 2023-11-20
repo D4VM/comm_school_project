@@ -1,7 +1,89 @@
-## comm school project
+# Setup project on local
+```bash
+mkdir app
+# NOTE: move project to app folder
+# NOTE: activate your virtual enviroment
+# NOTE: install requirements
+pip install -r src/requirements.txt
+```
+# Run the application
+## For Windows
+```bash
+# NOTE: open terminal and `cd` to `app/src` folder
+python flask --app main run 
+```
+
+```bash
+# NOTE: to debug app run with `--debug` flag
+python flask --app main run --debug
+```
+
+# Setup services
+## For Windows
+### Option 1
+#### Install OracleVirtualBox
+Download Alpine linux , install and run in virtual box.  
+Get ip address of VM with `ip addr` command.  
+Install docker on alpine. 
+
+Comment out in main.py `redis_conn = Redis()`  
+Uncomment in main.py `# redis_conn = Redis(host='10.10.1.153')  # Windows Host` and change ip addr with your VM's IP addr.  
+
+Comment out in db.py `client = MongoClient()`  
+Uncomment in db.py `# client = MongoClient(host='10.10.1.153', port=27017)  # Windows Host` and change ip addr with your VM's IP addr.
+
+Run mongo container.
+```bash
+docker run -d --name mongo --hostname host -p 27017:27017 -v /home/mongodb:/data/db mongo
+```
+Run redis container.
+```bash
+docker run -d --name redis --hostname host -p 6379:6379 -v /home/redis:/data redis
+```
+
+RQ workers will only run on systems that implement fork(). Most notably,  
+this means it is not possible to run the workers on Windows without using  
+the Windows Subsystem for Linux and running in a bash shell.  
+
+From Windows Store download Alpine.    
+After, run install all required dependencies.  
+CD to app/src/ folder in WSL and run `rq worker`  
+Then run the app.
+
+### Option 2
+#### Inside Docker
+Create an app image for docker container, and create docker-compose yaml config file.  
+Run everything inside docker(app, rq worker, redis, mongo)
+
+## For Linux
+### Install Docker
+For linux run Redis & Mongo in a container.  
+Then run the app from app folder
+
+Run mongo container.
+```bash
+docker run -d --name mongo --hostname host -p 27017:27017 -v /home/mongodb:/data/db mongo
+```
+Run redis container.
+```bash
+docker run -d --name redis --hostname host -p 6379:6379 -v /home/redis:/data redis
+```
+Run app  
+```bash
+# NOTE: open terminal and `cd` to app/src/ folder
+python3 flask --app main run 
+```
+Run app with debug
+```bash
+# NOTE: to debug app run with `--debug` flag
+python3 flask --app main run --debug
+```
 
 
-### [POST] /api/product/<URL>
+# API usage examples
+
+
+## [POST] /api/product/<URL>
 Scraping one product & adding it to database.
 Also adds this function as task to Redis RQ  
 Request example:
@@ -25,7 +107,7 @@ Database data example:
 }
 ```
 
-### [GET] /api/product/<URL>
+## [GET] /api/product/<URL>
 Queries database for specific car_id   
 Request example:
 ```
@@ -47,7 +129,7 @@ API response:
 }
 ```
 
-### [POST] /api/appraisal_request/
+## [POST] /api/appraisal_request/
 Searches for cars on myauto, adds cars to dict then appends to list.  
 Returns a list with dicts with data for searched car, then adds one by one data to database from a returned list. 
 
@@ -58,7 +140,7 @@ Request example:
 ```
 Note: `?p=` is used here as a post parameter
 
-### [GET] /api/appraisal_request/
+## [GET] /api/appraisal_request/
 Queries mongodb for cars.Returns Average Price(price_usd)  
 Request example:
 ```
