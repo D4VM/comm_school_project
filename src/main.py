@@ -1,20 +1,12 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from tools.op import scrape_and_add, add_one_from_list, appraisal
-from tools.db import query_product, query_database
+from tools.db import query_product, update_database, founded_car
 from tools.utils import extract_id
 from redis import Redis
 from rq import Queue
 
-# import rq_dashboard
-
 app = Flask(__name__)
 
-# app.config["RQ_DASHBOARD_REDIS_URL"] = 'redis://0.0.0.0:6379'
-# app.config.from_object(rq_dashboard.default_settings)
-# rq_dashboard.web.setup_rq_connection(app)
-# app.register_blueprint(rq_dashboard.blueprint, url_prefix="/rq")
-
-# redis_conn = Redis(host='10.10.1.153')  # Windows Host
 redis_conn = Redis()
 q = Queue(connection=redis_conn)
 
@@ -65,10 +57,23 @@ def send_appraisal_request():
 
 @app.get('/api/appraisal_request/')
 def get_appraisal():
-    # TODO: იდეაში კარგი იქნება თუ ესეც ჩაჯდეს ტასკში
     p = request.args.get('p', type=str)
     price_average = round(appraisal(p))
-    return {'average_price': f'{price_average}'}
+    if price_average != 0:
+        return {'average_price': f'{price_average}'}
+    else:
+        return {'message': 'you must first add car to database via POST request'}
+
+
+# [PUT]/api/product/<product_id> პროდუქტის ცვლილება
+@app.put('/api/product/<int:car_id>')
+def update_db(car_id):
+    update_data = request.get_json()
+    if founded_car(car_id):
+        update_database(car_id, update_data)
+        return {"message": "data updated"}
+    else:
+        return {"message": "car not found, add first"}
 
 
 if __name__ == '__main__':

@@ -14,8 +14,6 @@ def test_db_connection() -> bool:
     # Create a new client and connect to the server
     # client = MongoClient(url, server_api=ServerApi('1'))
     # Send a ping to confirm a successful connection
-    # reading database url from config.ini
-
     try:
         client.admin.command('ping')
         # print("Pinged Successfully. Connected to MongoDB!")
@@ -78,3 +76,27 @@ def query_database(car_dict: dict):
         car_price.append(item['price_usd'])
 
     return car_price
+
+
+def query_id(car_id: int) -> bool:
+    query_field = {'car_id': car_id}
+    result = cars.find_one(query_field)
+    if result:
+        return True
+    else:
+        return False
+
+
+def founded_car(car_id: int):
+    if query_id(car_id):
+        query_field = {'car_id': car_id}
+        result = cars.find_one(query_field, {'_id': 0})
+        return result
+    else:
+        return False
+
+
+def update_database(car_id: int, data: dict):
+    db_filter = {'car_id': car_id}
+    db_new_values = {"$set": data}
+    cars.update_one(db_filter, db_new_values)

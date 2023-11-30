@@ -1,6 +1,6 @@
-from tools.db import add_one , query_database
+from tools.db import add_one, query_database, founded_car
 from tools.scrape import scrape_one, search_scrape
-from tools.utils import calculate_average
+from tools.utils import calculate_average, extract_id
 
 
 # Workaround with RQ
@@ -24,7 +24,12 @@ def add_one_from_list(url):
 
 
 def appraisal(url: str):
-    data = scrape_one(url)
-    query = query_database(data)
-    average_price = calculate_average(query)
-    return average_price
+    # checks if car is already in database.
+    car_id = int(extract_id(url))
+    car_found = founded_car(car_id)
+    if car_found:
+        query = query_database(car_found)
+        average_price = calculate_average(query)
+        return average_price
+    else:
+        return 0
