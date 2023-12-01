@@ -64,7 +64,10 @@ def query_product(product_id: int):
         print('---> Problem with getting item from database')
 
 
-def query_database(car_dict: dict):
+def query_database(car_dict: dict) -> list:
+    """
+    Querys database with filter, returns list with prices
+    """
     query_fields = {
         'man_id': car_dict['man_id'],
         'model_id': car_dict['model_id'],
@@ -79,6 +82,9 @@ def query_database(car_dict: dict):
 
 
 def query_id(car_id: int) -> bool:
+    """
+    Querys for car-id
+    """
     query_field = {'car_id': car_id}
     result = cars.find_one(query_field)
     if result:
@@ -88,6 +94,9 @@ def query_id(car_id: int) -> bool:
 
 
 def founded_car(car_id: int):
+    """
+    Returns found car
+    """
     if query_id(car_id):
         query_field = {'car_id': car_id}
         result = cars.find_one(query_field, {'_id': 0})
@@ -97,6 +106,9 @@ def founded_car(car_id: int):
 
 
 def update_database(car_id: int, data: dict):
+    """
+    Updates a database entry
+    """
     db_filter = {'car_id': car_id}
     db_new_values = {"$set": data}
     cars.update_one(db_filter, db_new_values)
