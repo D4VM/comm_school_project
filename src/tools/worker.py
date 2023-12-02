@@ -11,4 +11,4 @@ def task_add_to_database(car_id: int):
             print(item_data)
             add_one(item_data.__dict__)
         else:
-            print('Item already in database')
+            print('item exist in database')

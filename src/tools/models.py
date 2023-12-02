@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, Union
-import json
+
 
 
 class Car(BaseModel):
