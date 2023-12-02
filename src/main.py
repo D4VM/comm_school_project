@@ -58,13 +58,16 @@ def send_appraisal_request():
         data = Car(**body)
         car_id = data.car_id
         q.enqueue(task_add_to_database, car_id)
-        return {'task': 'task for appraisal added'}
+        return {"task": "task for appraisal added"}
     except Exception as e:
         return {"message": e}
 
 
 @app.get('/api/appraisal_request/')
 def get_appraisal_request():
+    """
+    Returning found data
+    """
     try:
         data = Car(**request.json)
         car_id = data.car_id
@@ -94,6 +97,9 @@ def get_appraisal_request():
 
 @app.put('/api/product/')
 def update_db():
+    """
+    Updating data
+    """
     data = Car(**request.json)
     car_id = data.car_id
     if founded_car(car_id):

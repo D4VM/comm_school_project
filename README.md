@@ -23,8 +23,11 @@ python flask --app main run --debug
 ```
 
 # Setup services
+---
 
 ## For Windows
+
+---
 
 ### Option 1
 
@@ -63,12 +66,15 @@ After, run install all required dependencies.
 CD to app/src/ folder in WSL and run `rq worker`  
 Then run the app.
 
+---
+
 ### Option 2
 
 #### Inside Docker
 
 Create an app image for docker container, and create docker-compose yaml config file.  
 Run everything inside docker(app, rq worker, redis, mongo)
+---
 
 ## For Linux
 
@@ -89,6 +95,12 @@ Run redis container.
 docker run -d --name redis --hostname host -p 6379:6379 -v /home/redis:/data redis
 ```
 
+Run worker from src folder
+
+```bash
+rq worker
+```
+
 Run app
 
 ```bash
@@ -103,112 +115,158 @@ Run app with debug
 python3 flask --app main run --debug
 ```
 
+---
+
 # API usage examples
 
-## [POST] /api/product/<URL><MYAUTO.GE_URL>
+## API endpoints
 
-Scraping one product & adding it to database.
-Also adds this function as task to Redis RQ  
-Request example:
+---
 
-```
-/api/product/https://www.myauto.ge/ka/pr/97264590/iyideba-manqanebi-sedani-audi-s7-2017-benzini-tbilisi?offerType=superVip
-```
+### [POST]  `/api/product/`
 
-Database data example:
+**Data must be posted in request body as `raw` `JSON`**  
+Example:
 
 ```json
 {
-  "_id": {
-    "$oid": "6557826019be238645d9a9d1"
-  },
-  "car_id": 97172766,
-  "man_id": 41,
-  "model_id": 1124,
-  "prod_year": 2010,
-  "price_usd": 4500,
-  "price_value": 12155,
-  "fuel_type_id": 2,
+  "car_id": 1,
+  "man_id": 2,
+  "model_id": 3,
+  "prod_year": 2003,
+  "price_usd": 3000,
+  "price_value": 9000,
+  "fuel_type_id": 1,
   "gear_type_id": 2
 }
 ```
 
-## [GET] /api/product/<URL><MYAUTO.GE_URL>
+Output:
 
-Queries database for specific car_id   
-Request example:
+```JSON
+1. {
+  "message": "data added to database"
+}
 
-```
-/api/product/https://www.myauto.ge/ka/pr/98620870/iyideba-manqanebi-hechbeqi-toyota-prius-2010-hibridi-tbilisi?offerType=superVip
-```
 
-API response:
 
-```json
-{
-  "data": {
-    "car_id": 98620870,
-    "fuel_type_id": 6,
-    "gear_type_id": 4,
-    "man_id": 41,
-    "model_id": 1124,
-    "price_usd": 6300,
-    "price_value": 17016,
-    "prod_year": 2010
-  }
+2. {
+  "message": "item exist in database"
+}
+
+
+
+3. {
+  "message": e
 }
 ```
 
-## [POST] /api/appraisal_request/<MYAUTO.GE_URL>
+---
 
-Searches for cars on myauto, adds cars to dict then appends to list.  
-Returns a list with dicts with data for searched car, then adds one by one data to database from a returned list.
+### [GET] `/api/product/`
 
-Also adds this function as task to Redis RQ  
-Request example:
-
-```
-/api/appraisal_request/?p=https://www.myauto.ge/ka/pr/98620870/iyideba-manqanebi-hechbeqi-toyota-prius-2010-hibridi-tbilisi?offerType=superVip
-```
-
-Note: `?p=` is used here as a post parameter
-
-## [GET] /api/appraisal_request/<MYAUTO.GE_URL>
-
-Queries mongodb for cars.Returns Average Price(price_usd)  
-Request example:
-
-```
-/api/appraisal_request/?p=https://www.myauto.ge/ka/pr/98620870/iyideba-manqanebi-hechbeqi-toyota-prius-2010-hibridi-tbilisi?offerType=superVip
-```
-
-Note: `?p=` is used here as a post parameter
-
-Query example:
-
-```python
-query_fields = {
-    'man_id': car_dict['man_id'],
-    'model_id': car_dict['model_id'],
-    'prod_year': car_dict['prod_year']
-}
-```
-
-## [PUT] /api/product/<PRODUCT_ID>
-
-Updates Database for specific product ID.
-
-```
-/api/appraisal_request/99017431
-```
-
-Note: `request body` must be in `json`
-
-Request Body Example in `POSTMAN`:
+**Data must be posted in request body as `raw` `JSON`**  
+Example:
 
 ```JSON
 {
-  "prod_year": 1800,
-  "price_usd": 1000
+  "car_id": 1
+}
+```
+
+Output:
+
+```json
+{
+  "car_id": 1,
+  "man_id": 2,
+  "model_id": 3,
+  "prod_year": 2003,
+  "price_usd": 3000,
+  "price_value": 9000,
+  "fuel_type_id": 1,
+  "gear_type_id": 2
+}
+```
+
+---
+
+### [POST] `/api/appraisal_request/`
+
+**Data must be posted in request body as `raw` `JSON`**  
+Example:
+
+```JSON
+{
+  "car_id": 1
+}
+```
+
+Output:
+
+```JSON
+{
+  "task": "task for appraisal added"
+}
+```
+
+---
+
+### [GET] `/api/appraisal_request/`
+
+**Data must be posted in request body as `raw` `JSON`**  
+Example:
+
+```JSON
+{
+  "car_id": 99062659
+}
+```
+
+Output:
+
+```JSON
+{
+  "avg_price": 5074,
+  "max_price": 6200,
+  "min_price": 1850.07,
+  "sum_price": 142080.07,
+  "total_products": 28
+}
+```
+
+---
+
+### [PUT] `/api/product/`
+
+**Data must be posted in request body as `raw` `JSON`**  
+Example: `car_id` must be valid.  
+Data: `price_usd`,`price_value` is `int` or `float`.  
+Rest of the data must be `int`
+
+```JSON
+{
+  "car_id": 99062659,
+  "man_id": 222222,
+  "model_id": 2222222,
+  "prod_year": 2003222,
+  "price_usd": 3000222,
+  "price_value": 9000222,
+  "fuel_type_id": 1222,
+  "gear_type_id": 22222
+}
+```
+
+Output:
+
+```JSON
+1. {
+  "message": "data updated"
+}
+
+
+
+2. {
+  "message": "item not found"
 }
 ```
