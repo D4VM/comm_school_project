@@ -2,7 +2,6 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional, Union
 
 
-
 class Car(BaseModel):
     model_config = ConfigDict(
         protected_namespaces=('protect_me_', 'also_protect_')
@@ -16,3 +15,4 @@ class Car(BaseModel):
     price_value: Optional[Union[int, float]] = None
     fuel_type_id: Optional[int] = None
     gear_type_id: Optional[int] = None
+    appraisal_status: Optional[int] = None
