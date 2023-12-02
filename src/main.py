@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
-from tools.op import scrape_and_add, add_one_from_list, appraisal
-from tools.db import query_product, update_database, founded_car
-from tools.utils import extract_id
+import json
+from flask import Flask, request, redirect, url_for
+from tools.db import update_database, founded_car, add_one, search_database
+from tools.worker import task_add_to_database
+from tools.models import Car
 from redis import Redis
 from rq import Queue
 
@@ -13,67 +14,93 @@ q = Queue(connection=redis_conn)
 
 @app.route('/')
 def hello_world():
-    return '<p>Hello, World! <b>David!'
+    return '<p>Hello, World! <b>D4VM!'
 
 
-@app.post('/api/product/<path:url>/')
-def insert_to_database(url: str):
+@app.post('/api/product/')
+def post_to_database():
     """
-    Adding task for scrape data and insert to database
-    :param url:
+    Validating Data and Adding to database
     :return:
     """
 
-    q.enqueue(scrape_and_add, url)
+    try:
+        data = Car(**request.json)
+        if not founded_car(data.car_id):
+            add_one(data.__dict__)
+            return {"message": "data added to database"}
+        return {"message": "item exist in database"}
+    except Exception as e:
+        return {"message": e}
 
-    return {'task': 'task being added'}
 
-
-@app.get('/api/product/<path:url>/')
-def query_database(url: str):
+@app.get('/api/product/')
+def get_from_database():
     """
-    Query database for specific car_id.
-    extract_id func extracts car id from provided url.
-    :param url:
-    :return:
+    Getting data from Database
     """
-    product_id = int(extract_id(url))  # converting to int, extracting id from myauto URL
-    found_product = query_product(product_id)
-    return {'data': found_product}
+    try:
+        data = Car(**request.json)
+        if not founded_car(data.car_id):
+            return {"message": "item not found"}
+        return {"message": founded_car(data.car_id)}
+    except Exception as e:
+        return {"message": e}
 
 
-# [POST]/api/appraisal_request
 @app.post('/api/appraisal_request/')
 def send_appraisal_request():
     """
-    Send request to query myauto for specific car ( man_id, model_id, prod_year).
-    Founded cars then are added to mongodb.
-    :return:
+    Adding data to Database
     """
-    p = request.args.get('p', type=str)
-    q.enqueue(add_one_from_list, p)
-    return {'task': 'task for appraisal added'}
+    try:
+        body = request.json
+        data = Car(**body)
+        car_id = data.car_id
+        q.enqueue(task_add_to_database, car_id)
+        return {'task': 'task for appraisal added'}
+    except Exception as e:
+        return {"message": e}
 
 
 @app.get('/api/appraisal_request/')
-def get_appraisal():
-    p = request.args.get('p', type=str)
-    price_average = round(appraisal(p))
-    if price_average != 0:
-        return {'average_price': f'{price_average}'}
-    else:
-        return {'message': 'you must first add car to database via POST request'}
+def get_appraisal_request():
+    try:
+        data = Car(**request.json)
+        car_id = data.car_id
+        car_data = founded_car(car_id)
+        if car_data:
+            price_data = search_database(car_data)
+
+            total_products = len(price_data)
+            max_price = max(price_data)
+            min_price = min(price_data)
+            sum_price = sum(price_data)
+            avg_price = round(sum_price / total_products)
+
+            return {
+                "total_products": total_products,
+                "max_price": max_price,
+                "min_price": min_price,
+                "sum_price": sum_price,
+                "avg_price": avg_price
+            }
+        else:
+            return {"message": "item not found"}
+
+    except Exception as e:
+        return {"message": e}
 
 
-# [PUT]/api/product/<product_id> პროდუქტის ცვლილება
-@app.put('/api/product/<int:car_id>')
-def update_db(car_id):
-    update_data = request.get_json()
+@app.put('/api/product/')
+def update_db():
+    data = Car(**request.json)
+    car_id = data.car_id
     if founded_car(car_id):
-        update_database(car_id, update_data)
+        update_database(car_id, data.__dict__)
         return {"message": "data updated"}
     else:
-        return {"message": "car not found, add first"}
+        return {"message": "item not found"}
 
 
 if __name__ == '__main__':

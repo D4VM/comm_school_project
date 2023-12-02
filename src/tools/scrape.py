@@ -9,33 +9,29 @@ AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Mobile Safari/537.36"
 }
 
 
-def scrape_one(provided_url: str) -> dict:
+def scrape_one(car_id: int) -> dict:
     """
     Scrapes product from myauto.ge
     Inserts to database
-    :param provided_url:
+    :param car_id:
     :return:
     """
     base_url = 'https://api2.myauto.ge/ka/products/'
-    # checking if user provided url is correct
-    if validate_url(provided_url):
-        sleep(rr(5, 20))  # faking user with sleep & randrange functions
-        extracted_id = extract_id(provided_url)  # extracting id from url
-        requested_data = requests.get(f"{base_url}{extracted_id}", headers=headers)
-        # checking if status code is ok
-        if requested_data.status_code == 200:
-            json_data = requested_data.json().get('data').get('info')
-            car_dict = {
-                'car_id': json_data['car_id'],
-                'man_id': json_data['man_id'],
-                'model_id': json_data['model_id'],
-                'prod_year': json_data['prod_year'],
-                'price_usd': json_data['price_usd'],
-                'price_value': json_data['price_value'],
-                'fuel_type_id': json_data['fuel_type_id'],
-                'gear_type_id': json_data['gear_type_id']
-            }
-            return car_dict
+    sleep(rr(5, 20))  # faking user with sleep & randrange functions
+    requested_data = requests.get(f"{base_url}{car_id}", headers=headers)
+    if requested_data.status_code == 200:
+        json_data = requested_data.json().get('data').get('info')
+        car_dict = {
+            'car_id': json_data['car_id'],
+            'man_id': json_data['man_id'],
+            'model_id': json_data['model_id'],
+            'prod_year': json_data['prod_year'],
+            'price_usd': json_data['price_usd'],
+            'price_value': json_data['price_value'],
+            'fuel_type_id': json_data['fuel_type_id'],
+            'gear_type_id': json_data['gear_type_id']
+        }
+        return car_dict
 
 
 # https://api2.myauto.ge/ka/products?
@@ -48,11 +44,11 @@ def scrape_one(provided_url: str) -> dict:
 # MileageType=1&
 # Page=1
 
-def search_scrape(url: str):
+def search_scrape(car_id: int) -> list:
     """
     Returns a list with dicts with data for searched car.
     Must provide url.
-    :param url:
+    :param car_id:
     :return:
     """
 
@@ -61,7 +57,7 @@ def search_scrape(url: str):
         Creating a Valid Searchable URL for specific car
         :return:
         """
-        car_data = scrape_one(url)
+        car_data = scrape_one(car_id)
         car_man = car_data['man_id']
         car_mod = car_data['model_id']
         c_Mans = f'{car_man}.{car_mod}'  # Done
@@ -91,4 +87,4 @@ def search_scrape(url: str):
             cars_list.append(car_dict)
         return cars_list
     else:
-        return 'Bad Status Code'
+        return ["Bad Status Code"]

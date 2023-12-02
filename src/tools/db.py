@@ -41,30 +41,7 @@ def add_one(data):
         return False
 
 
-# for [GET]/api/product/<product_id> პროდუქტის დეტალური ინფორმაცია
-def query_product(product_id: int):
-    """
-    query database for specific car_id
-    :param product_id:
-    :return:
-    """
-    if test_db_connection():
-        try:
-            query_db = {"car_id": int(product_id)}
-            # {'_id': 0} added because ValueError: [TypeError("'ObjectId' object is not iterable") (stackoverflow)
-            products = cars.find(query_db, {'_id': 0})
-            if products:
-                for product in products:
-                    return product
-            return {"message": f"{query_db['car_id']} ID not found in database"}
-
-        except Exception as e:
-            return f"An error occurred: {e}"
-    else:
-        print('---> Problem with getting item from database')
-
-
-def query_database(car_dict: dict) -> list:
+def search_database(car_dict: dict) -> list:
     """
     Querys database with filter, returns list with prices
     """
@@ -109,6 +86,6 @@ def update_database(car_id: int, data: dict):
     """
     Updates a database entry
     """
-    db_filter = {'car_id': car_id}
+    db_filter = {"car_id": car_id}
     db_new_values = {"$set": data}
     cars.update_one(db_filter, db_new_values)
