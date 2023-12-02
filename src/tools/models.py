@@ -3,6 +3,9 @@ from typing import Optional, Union
 
 
 class Car(BaseModel):
+    """
+    Car model for data validation
+    """
     model_config = ConfigDict(
         protected_namespaces=('protect_me_', 'also_protect_')
     )
