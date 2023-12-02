@@ -144,19 +144,19 @@ Example:
 Output:
 
 ```JSON
-1. {
+{
   "message": "data added to database"
 }
 
 
 
-2. {
+{
   "message": "item exist in database"
 }
 
 
 
-3. {
+{
   "message": e
 }
 ```
@@ -260,13 +260,13 @@ Rest of the data must be `int`
 Output:
 
 ```JSON
-1. {
+{
   "message": "data updated"
 }
 
 
 
-2. {
+{
   "message": "item not found"
 }
 ```
